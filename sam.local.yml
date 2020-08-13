@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Function for fetching updates to check-in cards from the previous check period
+
+Globals:
+    Function:
+      Timeout: 300
+      Runtime: ruby2.7
+      Handler: app.handle_event
+      Layers:
+        - arn:aws:lambda:us-east-1:224280085904:layer:ruby-pg-sqlite-lambda:2
+      Environment:
+        Variables:
+          LOG_LEVEL: debug
+          AWS_REGION: us-east-1
+
+Resources:
+  SierraCheckInCardPoller:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+            DB_HOST: '10.146.200.10'
+            DB_PORT: '1032'
+            DB_NAME: iii
+            DB_USER: AQECAHjqALewp8JBJNxIQvR4oY795dyG7INaGR1glMsTEgetggAAAGcwZQYJKoZIhvcNAQcGoFgwVgIBADBRBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDODduMNijbjOeMwFjQIBEIAkt5GHQJEaAcShDYxOx1FY0AGEKIWu6yOpzhc2gzjp8gobPJUD
+            DB_PSWD: AQECAHjqALewp8JBJNxIQvR4oY795dyG7INaGR1glMsTEgetggAAAGwwagYJKoZIhvcNAQcGoF0wWwIBADBWBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDMd4YSniu1opPIHQpwIBEIApCgNpdccxBas9saGG1buhLcsMzGlVJqTBe15VSFk286b1kNJPoXmBKWs=
+            DB_QUERY: 'SELECT sierra_view.holding_record_card.id,sierra_view.holding_record_card.holding_record_id,sierra_view.bib_view.record_num,sierra_view.holding_record_box.* FROM sierra_view.holding_record_card LEFT OUTER JOIN sierra_view.bib_record_holding_record_link ON sierra_view.holding_record_card.holding_record_id=sierra_view.bib_record_holding_record_link.holding_record_id LEFT OUTER JOIN sierra_view.bib_view ON sierra_view.bib_view.id=sierra_view.bib_record_holding_record_link.bib_record_id LEFT OUTER JOIN sierra_view.holding_record_box ON sierra_view.holding_record_box.holding_record_cardlink_id=sierra_view.holding_record_card.id LIMIT 60000'
+            SQLITE_FILE: 'checkInCards.sql'
