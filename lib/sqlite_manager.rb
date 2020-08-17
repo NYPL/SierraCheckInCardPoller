@@ -45,7 +45,7 @@ class SQLITEClient
         BOXES
     end
 
-    def insert_row fields, rows
+    def insert_rows fields, rows
        $logger.info "Inserting #{rows.length} rows into sqlite db" 
         
        insert_stmt = _generate_row_statements rows

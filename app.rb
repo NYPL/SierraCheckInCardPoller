@@ -46,12 +46,12 @@ def store_rows box_rows
     box_rows.each do |row|
         rows << fields.map { |k| row[k] }
         if rows.length % 100 == 0
-            $sqlite_client.insert_row(fields, rows)
+            $sqlite_client.insert_rows(fields, rows)
             rows = []
         end
     end
 
     if rows.length % 100 != 0
-        $sqlite_client.insert_row(fields, rows)
+        $sqlite_client.insert_rows(fields, rows)
     end
 end

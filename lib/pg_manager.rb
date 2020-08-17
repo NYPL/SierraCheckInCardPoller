@@ -1,6 +1,5 @@
-p ENV['GEM_PATH']
-
 require 'pg'
+
 
 class PSQLClient
     def initialize
@@ -21,7 +20,7 @@ class PSQLClient
             @conn.exec query
         rescue Exception => e
             $logger.error "Unable to query Sierra db for check-in rows", { :message => e.message }
-            raise PSQLError "Cannot execute query against Sierra db, no rows retrieved"
+            raise PSQLError.new "Cannot execute query against Sierra db, no rows retrieved"
         end
     end
 end
