@@ -27,7 +27,7 @@ task :set_current_env_vars do
     travis_conf['deploy'].each do |dep|
         if dep[true]['branch'] == ENV['TRAVIS_BRANCH']
             env_var_str = "Variables={#{dep['environment'].join(', ')}}"
-            sh %{ aws lambda update-function-configuration --function-name #{dep['function_name']} --environment "#{env_var_str} --region us-east-1 }
+            sh %{ aws lambda update-function-configuration --function-name #{dep['function_name']} --environment "#{env_var_str}" --region us-east-1 }
             break
         end
     end
