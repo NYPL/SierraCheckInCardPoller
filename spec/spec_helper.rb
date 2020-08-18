@@ -23,6 +23,7 @@ ENV['DB_NAME'] = 'test_db'
 ENV['DB_USER'] = 'test_usr'
 ENV['DB_PSWD'] = 'test_pswd'
 ENV['AWS_REGION'] = 'test'
+ENV['SQLITE_BUCKET'] = 'test_bucket'
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate

@@ -24,7 +24,7 @@ describe S3Client do
 
         it "should successfully call put_object and store the file" do
             @test_client.instance_variable_get(:@s3).stubs(:put_object).once.with(
-                :body => 'test_data', :bucket => "check-in-card-data", :key => 'test_file'
+                :body => 'test_data', :bucket => "test_bucket", :key => 'test_file'
             )
 
             @test_client.store_data "test_file"
@@ -32,7 +32,7 @@ describe S3Client do
 
         it "should raise an error if unable to store the file in s3" do
             @test_client.instance_variable_get(:@s3).stubs(:put_object).once.with(
-                :body => 'test_data', :bucket => "check-in-card-data", :key => 'test_file'
+                :body => 'test_data', :bucket => "test_bucket", :key => 'test_file'
             ).raises(StandardError.new("Unable to store sqlite db in s3"))
 
             expect { @test_client.send(:store_data, "test_file") }.to raise_error(S3Error, "Unable to store sqlite db in s3")

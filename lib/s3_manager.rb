@@ -18,7 +18,7 @@ class S3Client
         begin
             resp = @s3.put_object({
                 :body => sqlData,
-                :bucket => "check-in-card-data",
+                :bucket => ENV['SQLITE_BUCKET'],
                 :key => file,
             })
         rescue Exception => e
