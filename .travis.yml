@@ -4,6 +4,7 @@ rvm:
 before_install:
 - gem update --system
 - gem install bundler
+- pip install awscli
 install:
 - rake run_bundler
 script:
@@ -27,7 +28,7 @@ deploy:
   - DB_PORT=1032
   - DB_PSWD=AQECAHjqALewp8JBJNxIQvR4oY795dyG7INaGR1glMsTEgetggAAAGwwagYJKoZIhvcNAQcGoF0wWwIBADBWBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDMd4YSniu1opPIHQpwIBEIApCgNpdccxBas9saGG1buhLcsMzGlVJqTBe15VSFk286b1kNJPoXmBKWs=
   - DB_USER=AQECAHjqALewp8JBJNxIQvR4oY795dyG7INaGR1glMsTEgetggAAAGcwZQYJKoZIhvcNAQcGoFgwVgIBADBRBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDODduMNijbjOeMwFjQIBEIAkt5GHQJEaAcShDYxOx1FY0AGEKIWu6yOpzhc2gzjp8gobPJUD
-  - DB_QUERY=SELECT sierra_view.holding_record_card.id,sierra_view.holding_record_card.holding_record_id,sierra_view.bib_view.record_num,sierra_view.holding_record_box.* FROM sierra_view.holding_record_card LEFT OUTER JOIN sierra_view.bib_record_holding_record_link ON sierra_view.holding_record_card.holding_record_id=sierra_view.bib_record_holding_record_link.holding_record_id LEFT OUTER JOIN sierra_view.bib_view ON sierra_view.bib_view.id=sierra_view.bib_record_holding_record_link.bib_record_id LEFT OUTER JOIN sierra_view.holding_record_box ON sierra_view.holding_record_box.holding_record_cardlink_id=sierra_view.holding_record_card.id
+  - DB_QUERY='SELECT sierra_view.holding_record_card.id,sierra_view.holding_record_card.holding_record_id,sierra_view.bib_view.record_num,sierra_view.holding_record_box.* FROM sierra_view.holding_record_card LEFT OUTER JOIN sierra_view.bib_record_holding_record_link ON sierra_view.holding_record_card.holding_record_id=sierra_view.bib_record_holding_record_link.holding_record_id LEFT OUTER JOIN sierra_view.bib_view ON sierra_view.bib_view.id=sierra_view.bib_record_holding_record_link.bib_record_id LEFT OUTER JOIN sierra_view.holding_record_box ON sierra_view.holding_record_box.holding_record_cardlink_id=sierra_view.holding_record_card.id'
   - SQLITE_FILE=checkInCards.sql
   skip_cleanup: true
   access_key_id: "$AWS_ACCESS_KEY_ID_QA"
