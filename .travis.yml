@@ -8,3 +8,31 @@ install:
 - rake run_bundler
 script:
 - rake test
+deploy:
+- provider: lambda
+  function_name: SierraCheckInCardPoller-qa
+  description: Poller service for fetching daily updates to the check-in card/box records
+  region: us-east-1
+  role: arn:aws:iam::946183545209:role/lambda-full-access
+  runtime: ruby2.7
+  module_name: app
+  handler_name: handle_event
+  environment:
+  - LOG_LEVEL=info
+  - DB_HOST=10.146.200.10
+  - DB_PORT=1032
+  - DB_PSWD=AQECAHjqALewp8JBJNxIQvR4oY795dyG7INaGR1glMsTEgetggAAAGwwagYJKoZIhvcNAQcGoF0wWwIBADBWBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDMd4YSniu1opPIHQpwIBEIApCgNpdccxBas9saGG1buhLcsMzGlVJqTBe15VSFk286b1kNJPoXmBKWs=
+  - DB_USER=AQECAHjqALewp8JBJNxIQvR4oY795dyG7INaGR1glMsTEgetggAAAGcwZQYJKoZIhvcNAQcGoFgwVgIBADBRBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDODduMNijbjOeMwFjQIBEIAkt5GHQJEaAcShDYxOx1FY0AGEKIWu6yOpzhc2gzjp8gobPJUD
+  - DB_QUERY=SELECT sierra_view.holding_record_card.id,sierra_view.holding_record_card.holding_record_id,sierra_view.bib_view.record_num,sierra_view.holding_record_box.* FROM sierra_view.holding_record_card LEFT OUTER JOIN sierra_view.bib_record_holding_record_link ON sierra_view.holding_record_card.holding_record_id=sierra_view.bib_record_holding_record_link.holding_record_id LEFT OUTER JOIN sierra_view.bib_view ON sierra_view.bib_view.id=sierra_view.bib_record_holding_record_link.bib_record_id LEFT OUTER JOIN sierra_view.holding_record_box ON sierra_view.holding_record_box.holding_record_cardlink_id=sierra_view.holding_record_card.id
+  - SQLITE_FILE=checkInCards.sql
+  skip_cleanup: true
+  access_key_id: "$AWS_ACCESS_KEY_ID_QA"
+  secret_access_key: "$AWS_SECRET_ACCESS_KEY_QA"
+  on:
+    branch: qa
+after_deploy:
+  - rake set_current_env_vars[$AWS_ACCESS_KEY_ID_QA, $AWS_SECRET_ACCESS_KEY_QA]
+env:
+  global:
+  - secure: ixD5jyowV/EkboKhBx3FCRjPKxGNLKET0iRSOSQn3UpU6GWcMSW/C4fMHLyL8DOBHuFtmXpfzjpbF6r4fNiKDx4e6iJcJxZapF5CE1Fw/x1S237fniMquNRrJfE2R6Z7wrudwWV9pNzAUuVuLL4DCk2TJ8lemJEuH7d6ZhPU72t5+NkfRLNhKbPpEm7VM7awNg+WxP4J/ZvKemkhjJ2v2rgCR0+zvgCePGskzWpKLloGOtDyPCmlv+2PhQziJLCV+HrwlPFqj2Iz8IAmrieCZc2pSiTU/XQ7gfbOiYlUpjpXQanrBH9UEcVMf1SHWlQynfsj+XJnmBjOjoG9LE3k2t51mTJj/GhJdei5UJvmy3f+dmAkeUZFRbRkIT0Dq8NVYZvIRMN1BGHILii0gPrebL3ODsDfAjhABU/r/8CWgfWiRiONDKEjRABlANPzVx4eid2KUnR308LHBJoF4uUyUyR2whoSDIgzXBzH5CT1bLTeA2cvFSr4g2de/Q0LI6MWJ0lsFN9noGOSxnthMM5zu4t1lVnAGMLfHrCAs+ESxKNDJyrl2/B+dY5umTeU5PaAXO9lrUdhm5e9qlEmP3gaIDtcwoCyGdvg+ZvcW/duw5hxjGG/9yNs3PY0eTwsdDmGemecdRQ/2MjTjhOCiDiLrDV63NUucHC6h8ZyZYMlieU=
+  - secure: RpPycTqtBNcxT29j65CBBCZtR2uvI4zK2S92NJDca8ggtnJ+taA56VLMRPUQGWwUAUMgIF3qVR0rGwCCbf6HBML5fPhB+rG7jpDZwUm0kIoby9Vxqzqsj7OPAP9N8WBMaLTAk7zVcq85Fee5N/rAlytnR/UIK43i0YJ0Gnx2HT7s377+Zbe+fKkJTY2E631Iz6U777+ze6OgnaxhDXUG4I+I9Kl1+a8qunHrZp0hIwKwYCVxCKUCM46PlgB+jCcyFwWgUeGoHtxaZ4f7YUFLYGSWSnARCJN+pDX2tmEmNwcDmGqGDptCq3R00H68UZFPeRZl9OPRn2BU6FJ+NlkKirj0WfnG7Wlp9E9+tXjOQ9eqBwpOF0xppUBRpPk/AAh/onl8WaBHJyOFzP8VUiVcQmhFRkqTiwC1DsFVOMRjZSPeKZgBbiZu0HgZsedxYhhLX/t8vI7cqLzWHDojtfbjZ1XPgMGsBkIc/K43uMxSXfeCQVkbnEG4JMpW72tPzt1GsIZ5fXAJsnoJ4EmbEqYJeAJVskPcB5EHarl7CJMMxU+4mwkTtR/g1mzJH8QN0vuNSgYuy3+YKtvg7Ckq3KDs0lNNtVadY/G+25w96FBA6GHLvpXTE+x8/FvdWHVqDhxPEy6eVWa5XRA/DqtWk473X9Q8Zc9MxLBfENkwANTrnms=
