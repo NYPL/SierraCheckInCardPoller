@@ -8,6 +8,9 @@ install:
 - rake run_bundler
 script:
 - rake test
+before_deploy:
+- rm -rf vendor
+- bundle install --without test
 deploy:
 - provider: lambda
   function_name: SierraCheckInCardPoller-qa
@@ -15,6 +18,7 @@ deploy:
   region: us-east-1
   role: arn:aws:iam::946183545209:role/lambda-full-access
   runtime: ruby2.7
+  timeout: 300
   module_name: app
   handler_name: handle_event
   environment:
@@ -31,7 +35,7 @@ deploy:
   on:
     branch: qa
 after_deploy:
-  - rake set_current_env_vars[$AWS_ACCESS_KEY_ID_QA, $AWS_SECRET_ACCESS_KEY_QA]
+  - rake set_current_env_vars
 env:
   global:
   - secure: ixD5jyowV/EkboKhBx3FCRjPKxGNLKET0iRSOSQn3UpU6GWcMSW/C4fMHLyL8DOBHuFtmXpfzjpbF6r4fNiKDx4e6iJcJxZapF5CE1Fw/x1S237fniMquNRrJfE2R6Z7wrudwWV9pNzAUuVuLL4DCk2TJ8lemJEuH7d6ZhPU72t5+NkfRLNhKbPpEm7VM7awNg+WxP4J/ZvKemkhjJ2v2rgCR0+zvgCePGskzWpKLloGOtDyPCmlv+2PhQziJLCV+HrwlPFqj2Iz8IAmrieCZc2pSiTU/XQ7gfbOiYlUpjpXQanrBH9UEcVMf1SHWlQynfsj+XJnmBjOjoG9LE3k2t51mTJj/GhJdei5UJvmy3f+dmAkeUZFRbRkIT0Dq8NVYZvIRMN1BGHILii0gPrebL3ODsDfAjhABU/r/8CWgfWiRiONDKEjRABlANPzVx4eid2KUnR308LHBJoF4uUyUyR2whoSDIgzXBzH5CT1bLTeA2cvFSr4g2de/Q0LI6MWJ0lsFN9noGOSxnthMM5zu4t1lVnAGMLfHrCAs+ESxKNDJyrl2/B+dY5umTeU5PaAXO9lrUdhm5e9qlEmP3gaIDtcwoCyGdvg+ZvcW/duw5hxjGG/9yNs3PY0eTwsdDmGemecdRQ/2MjTjhOCiDiLrDV63NUucHC6h8ZyZYMlieU=

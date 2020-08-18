@@ -17,10 +17,10 @@ task :run_bundler do
 end
 
 desc "Run AWS environment config to set environment variables"
-task :set_current_env_vars, [:access_key, :secret_key] do |t, args|
-    if args[:access_key] && args[:secret_key]
-        sh %{ aws configure set aws_access_key_id #{args[:access_key]} }
-        sh %{ aws configure set aws_secret_access_key #{args[:secret_key]} }
+task :set_current_env_vars do
+    if ENV['AWS_ACCESS_KEY_ID_QA'] && ENV['AWS_SECRET_ACCESS_KEY_QA']
+        sh %{ aws configure set aws_access_key_id #{ENV['AWS_ACCESS_KEY_ID_QA']} }
+        sh %{ aws configure set aws_secret_access_key #{ENV['AWS_SECRET_ACCESS_KEY_QA']} }
     end
 
     travis_conf = YAML.load(File.read('.travis.yml'))
