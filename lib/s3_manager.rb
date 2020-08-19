@@ -21,7 +21,7 @@ class S3Client
                 key => file,
             })
         rescue StandardError => e
-            $logger.error 'Unable to store sqlite db in s3', { status => e.message }
+            $logger.error 'Unable to store sqlite db in s3', { status: e.message }
             raise S3Error, 'Unable to store sqlite db in s3'
         end
     end

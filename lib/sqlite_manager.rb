@@ -53,7 +53,7 @@ class SQLITEClient
         begin
             @db.execute("INSERT INTO boxes (#{fields.join(', ')}) VALUES #{insert_stmt};")
         rescue StandardError => e
-            $logger.error 'Unable to insert rows into boxes table', { 'code' => e.code }
+            $logger.error 'Unable to insert rows into boxes table', { code: e.code }
             raise SqliteError, 'Failed to insert row into sqlite db'
         end
     end

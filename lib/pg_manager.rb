@@ -20,7 +20,7 @@ class PSQLClient
         begin
             @conn.exec query
         rescue StandardError => e
-            $logger.error 'Unable to query Sierra db for check-in rows', { message => e.message }
+            $logger.error 'Unable to query Sierra db for check-in rows', { message: e.message }
             raise PSQLError, 'Cannot execute query against Sierra db, no rows retrieved'
         end
     end
