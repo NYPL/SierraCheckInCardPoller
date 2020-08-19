@@ -25,7 +25,7 @@ task :set_current_env_vars do
 
     travis_conf = YAML.safe_load(File.read('.travis.yml'))
     travis_conf['deploy'].each do |dep|
-        break if dep[true]['branch'] == ENV['TRAVIS_BRANCH']
+        break if dep[true]['branch'] != ENV['TRAVIS_BRANCH']
 
         env_var_str = "Variables={#{dep['environment'].join(', ')}}"
         # rubocop:disable Layout/LineLength
