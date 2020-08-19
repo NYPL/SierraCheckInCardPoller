@@ -16,9 +16,9 @@ class S3Client
         # Store file in s3
         begin
             @s3.put_object({
-                body => sql_data,
-                bucket => ENV['SQLITE_BUCKET'],
-                key => file,
+                body: sql_data,
+                bucket: ENV['SQLITE_BUCKET'],
+                key: file,
             })
         rescue StandardError => e
             $logger.error 'Unable to store sqlite db in s3', { status: e.message }
