@@ -8,6 +8,7 @@ before_install:
 install:
 - rake run_bundler
 script:
+- rake lint
 - rake test
 before_deploy:
 - rm -rf vendor

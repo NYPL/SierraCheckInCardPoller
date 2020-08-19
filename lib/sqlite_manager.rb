@@ -1,13 +1,13 @@
 require 'sqlite3'
 
-
+# Client for creating and updating local sqlite3 database
 class SQLITEClient
     def initialize
         @db = SQLite3::Database.new "/tmp/#{ENV['SQLITE_FILE']}"
     end
 
     def create_table
-        $logger.info "Creating boxes table in sqlite database"
+        $logger.info 'Creating boxes table in sqlite database'
 
         @db.execute <<-BOXES
             create table boxes (
@@ -45,36 +45,35 @@ class SQLITEClient
         BOXES
     end
 
-    def insert_rows fields, rows
-       $logger.info "Inserting #{rows.length} rows into sqlite db" 
-        
-       insert_stmt = _generate_row_statements rows
+    def insert_rows(fields, rows)
+        $logger.info "Inserting #{rows.length} rows into sqlite db"
+
+        insert_stmt = _generate_row_statements rows
 
         begin
             @db.execute("INSERT INTO boxes (#{fields.join(', ')}) VALUES #{insert_stmt};")
-        rescue Exception => e
-            $logger.error "Unable to insert rows into boxes table", { "code" => e.code }
-            raise SqliteError.new "Failed to insert row into sqlite db"
+        rescue StandardError => e
+            $logger.error 'Unable to insert rows into boxes table', { 'code' => e.code }
+            raise SqliteError, 'Failed to insert row into sqlite db'
         end
     end
 
-    private 
+    private
 
-    def _generate_row_statements rows
-        insert_stmt = rows.map { |row|
+    def _generate_row_statements(rows)
+        rows.map do |row|
             $logger.debug "Inserting row# #{row[0]} into sqlite database"
             _prepare_row row
-        }.join(', ')
+        end.join(', ')
     end
 
-    def _prepare_row row
-        row_arr = row.map { |r|
+    def _prepare_row(row)
+        row_arr = row.map do |r|
             r ? "'#{r.gsub(/'/, "\\'")}'" : 'null'
-        }
+        end
 
-        return "(#{row_arr.join(', ')})"
+        "(#{row_arr.join(', ')})"
     end
 end
-
 
 class SqliteError < StandardError; end

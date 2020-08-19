@@ -7,21 +7,20 @@ require_relative 'lib/s3_manager'
 def init
     return if $initialized
 
-    $logger = NYPLRubyUtil::NyplLogFormatter.new(STDOUT, level: ENV['LOG_LEVEL'])
+    $logger = NYPLRubyUtil::NyplLogFormatter.new($stdout, level: ENV['LOG_LEVEL'])
     $kms_client = NYPLRubyUtil::KmsClient.new
     $pg_client = PSQLClient.new
     $sqlite_client = SQLITEClient.new
     $s3_client = S3Client.new
 
-    $logger.debug "Initialized function"
+    $logger.debug 'Initialized function'
     $initialized = true
 end
 
-
-def handle_event(event:, context:)
+def handle_event(*)
     init
 
-    $logger.info "Loading recent updates from the Sierra database"
+    $logger.info 'Loading recent updates from the Sierra database'
 
     # Create sqlite db in tmp
     $sqlite_client.create_table
@@ -37,21 +36,22 @@ def handle_event(event:, context:)
 end
 
 def fetch_rows
-    card_rows = $pg_client.exec_query ENV['DB_QUERY']
+    $pg_client.exec_query ENV['DB_QUERY']
 end
 
-def store_rows box_rows
+def store_rows(box_rows)
     fields = box_rows[0].keys
     rows = []
     box_rows.each do |row|
         rows << fields.map { |k| row[k] }
-        if rows.length % 100 == 0
-            $sqlite_client.insert_rows(fields, rows)
-            rows = []
-        end
+
+        next unless rows.length % 100 == 0
+
+        $sqlite_client.insert_rows(fields, rows)
+        rows = []
     end
 
-    if rows.length % 100 != 0
-        $sqlite_client.insert_rows(fields, rows)
-    end
+    return unless rows.length % 100 != 0
+
+    $sqlite_client.insert_rows(fields, rows)
 end
