@@ -1,11 +1,12 @@
 source 'https://rubygems.org'
 
-gem 'nypl_ruby_util'
 gem 'aws-sdk-s3'
+gem 'nypl_ruby_util'
 
 group :test do
-    gem 'rspec'
     gem 'mocha'
     gem 'pg'
+    gem 'rspec'
+    gem 'rubocop', require: false
     gem 'sqlite3'
 end
