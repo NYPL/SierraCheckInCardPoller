@@ -23,8 +23,8 @@ Resources:
             DB_HOST: '10.146.200.10'
             DB_PORT: '1032'
             DB_NAME: iii
-            DB_USER: AQECAHjqALewp8JBJNxIQvR4oY795dyG7INaGR1glMsTEgetggAAAGcwZQYJKoZIhvcNAQcGoFgwVgIBADBRBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDODduMNijbjOeMwFjQIBEIAkt5GHQJEaAcShDYxOx1FY0AGEKIWu6yOpzhc2gzjp8gobPJUD
-            DB_PSWD: AQECAHjqALewp8JBJNxIQvR4oY795dyG7INaGR1glMsTEgetggAAAGwwagYJKoZIhvcNAQcGoF0wWwIBADBWBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDMd4YSniu1opPIHQpwIBEIApCgNpdccxBas9saGG1buhLcsMzGlVJqTBe15VSFk286b1kNJPoXmBKWs=
+            DB_USER: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAGcwZQYJKoZIhvcNAQcGoFgwVgIBADBRBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDNapmZKmWxO59lrUhAIBEIAkPcsXj35Is8+naFzWIsWYMa9Yvt+aJZqfFZgDicQSnmEUAWBr
+            DB_PSWD: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAGwwagYJKoZIhvcNAQcGoF0wWwIBADBWBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDDnjoRlSmwePv1QxSwIBEIAplnBJKYjr0qYPnQ3GIZ3yDzbf3i0Aa5q+dLB07MRFxbF6Rok1MKeCwZ8=
             DB_QUERY: 'SELECT sierra_view.holding_record_card.id,sierra_view.holding_record_card.holding_record_id,sierra_view.bib_view.record_num,sierra_view.holding_record_box.* FROM sierra_view.holding_record_card LEFT OUTER JOIN sierra_view.bib_record_holding_record_link ON sierra_view.holding_record_card.holding_record_id=sierra_view.bib_record_holding_record_link.holding_record_id LEFT OUTER JOIN sierra_view.bib_view ON sierra_view.bib_view.id=sierra_view.bib_record_holding_record_link.bib_record_id LEFT OUTER JOIN sierra_view.holding_record_box ON sierra_view.holding_record_box.holding_record_cardlink_id=sierra_view.holding_record_card.id LIMIT 60000'
             SQLITE_FILE: 'checkInCards.sql'
             SQLITE_BUCKET: 'check-in-card-data-qa'
