@@ -39,7 +39,7 @@ def fetch_and_store_rows
     limit = 100_000
     loop do
         $logger.info "Querying sierra for record batch #{offset}:#{limit}"
-        box_rows = $pg_client.exec_query(ENV['DB_QUERY'], offset, limit)
+        box_rows = $pg_client.exec_query(ENV['DB_QUERY'], offset: offset, limit: limit)
 
         break unless box_rows.ntuples > 0
 

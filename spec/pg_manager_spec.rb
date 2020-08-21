@@ -40,6 +40,22 @@ describe PSQLClient do
             expect(resp).to eq('test response')
         end
 
+        it 'should execute a sql query with offset/limit if provided' do
+            @mock_conn.stubs(:exec).once.with('test query OFFSET 10 LIMIT 1').returns('test response')
+
+            resp = @test_client.exec_query('test query', offset: 10, limit: 1)
+
+            expect(resp).to eq('test response')
+        end
+
+        it 'should execute a sql query with only limit if provided and offset is nil' do
+            @mock_conn.stubs(:exec).once.with('test query LIMIT 1').returns('test response')
+
+            resp = @test_client.exec_query('test query', limit: 1)
+
+            expect(resp).to eq('test response')
+        end
+
         it 'should raise a PSQLError if an exception occurs during the query' do
             @mock_conn.stubs(:exec).once.raises(StandardError.new('Test db error'))
 

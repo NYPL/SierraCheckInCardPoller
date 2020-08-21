@@ -65,7 +65,7 @@ class SQLITEClient
 
     def _generate_row_statements(rows)
         rows.map do |row|
-            next if row[0] == nil
+            next if row[0].nil?
 
             $logger.debug "Inserting row# #{row[0]} into sqlite database"
             _prepare_row row

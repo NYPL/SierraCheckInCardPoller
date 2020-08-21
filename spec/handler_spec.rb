@@ -41,27 +41,36 @@ describe 'handler' do
             $s3_client = mock_s3
         end
 
-        it 'should invoke validate_record and send_record_to_stream for each record' do
+        it 'should invoke create_table, fetch_and_store_rows and store_data' do
             stubs(:init).once
             $sqlite_client.stubs(:create_table).once
-            stubs(:fetch_rows).once.returns([1, 2, 3])
-            stubs(:store_rows).once.with([1, 2, 3])
+            stubs(:fetch_and_store_rows).once
             $s3_client.stubs(:store_data).once.with('test.sql')
 
             handle_event(event: {}, context: {})
         end
     end
 
-    describe :fetch_rows do
+    describe :fetch_and_store_rows do
         before(:each) do
             mock_pg = mock
             $pg_client = mock_pg
         end
 
-        it 'should execute a query against the postgres database' do
-            $pg_client.stubs(:exec_query).once.with('TEST QUERY')
+        it 'should execute batch queries against the postgres database until no rows returned' do
+            response_with_rows = mock
+            response_with_rows.stubs(:ntuples).returns(100)
 
-            fetch_rows
+            response_without_rows = mock
+            response_without_rows.stubs(:ntuples).returns(0)
+
+            $pg_client.stubs(:exec_query).once.with('TEST QUERY', offset: 0, limit: 100_000).returns(response_with_rows)
+            $pg_client.stubs(:exec_query).once.with('TEST QUERY', offset: 100_000, limit: 100_000)\
+                .returns(response_without_rows)
+
+            stubs(:store_rows).once.with(response_with_rows)
+
+            fetch_and_store_rows
         end
     end
 
