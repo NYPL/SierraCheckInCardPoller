@@ -25,18 +25,27 @@ def handle_event(*)
     # Create sqlite db in tmp
     $sqlite_client.create_table
 
-    # Fetch check-in box rows from the Sierra db
-    box_rows = fetch_rows
-
-    # Store rows in sqlite db
-    store_rows box_rows
+    # Fetch check-in box rows from the Sierra db and store them in sqlite
+    # Because there are 800k+ records in the db, the query is split into chunks
+    # to prevent timeouts. Each chunk is written to the local db in order
+    fetch_and_store_rows
 
     # Store the sqlite db in a s3 bucket
     $s3_client.store_data ENV['SQLITE_FILE']
 end
 
-def fetch_rows
-    $pg_client.exec_query ENV['DB_QUERY']
+def fetch_and_store_rows
+    offset = 0
+    limit = 100_000
+    loop do
+        $logger.info "Querying sierra for record batch #{offset}:#{limit}"
+        box_rows = $pg_client.exec_query(ENV['DB_QUERY'], offset, limit)
+
+        break unless box_rows.ntuples > 0
+
+        store_rows box_rows
+        offset += limit
+    end
 end
 
 def store_rows(box_rows)

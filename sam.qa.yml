@@ -4,7 +4,8 @@ Description: Function for fetching updates to check-in cards from the previous c
 
 Globals:
     Function:
-      Timeout: 300
+      Timeout: 600
+      MemorySize: 256
       Runtime: ruby2.7
       Handler: app.handle_event
       Layers:
