@@ -13,9 +13,12 @@ class PSQLClient
         )
     end
 
-    def exec_query(query)
+    def exec_query(query, offset: nil, limit: nil)
         $logger.info 'Querying Sierra db for check-in boxes'
         $logger.debug "Executing query: #{query}"
+
+        query = "#{query} OFFSET #{offset}" if offset
+        query = "#{query} LIMIT #{limit}" if limit
 
         begin
             @conn.exec query

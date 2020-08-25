@@ -34,13 +34,13 @@ class SQLITEClient
                 chron_level_k_trans_date int,
                 chron_level_l_trans_date int,
                 chron_level_m_trans_date int,
-                note varchar(250),
+                note varchar(500),
                 box_status_code char(1),
                 claim_cnt int,
                 copies_cnt int,
-                url varchar(250),
+                url varchar(500),
                 is_suppressed bool,
-                staff_note varchar(250)
+                staff_note varchar(500)
             );
         BOXES
     end
@@ -50,9 +50,12 @@ class SQLITEClient
 
         insert_stmt = _generate_row_statements rows
 
+        return if insert_stmt.length == 0
+
         begin
             @db.execute("INSERT INTO boxes (#{fields.join(', ')}) VALUES #{insert_stmt};")
         rescue StandardError => e
+            $logger.debug insert_stmt
             $logger.error 'Unable to insert rows into boxes table', { code: e.code }
             raise SqliteError, 'Failed to insert row into sqlite db'
         end
@@ -62,14 +65,16 @@ class SQLITEClient
 
     def _generate_row_statements(rows)
         rows.map do |row|
+            next if row[0].nil?
+
             $logger.debug "Inserting row# #{row[0]} into sqlite database"
             _prepare_row row
-        end.join(', ')
+        end.compact.join(', ')
     end
 
     def _prepare_row(row)
         row_arr = row.map do |r|
-            r ? "'#{r.gsub(/'/, "\\'")}'" : 'null'
+            r ? "'#{r.gsub(/'/, "''")}'" : 'null'
         end
 
         "(#{row_arr.join(', ')})"

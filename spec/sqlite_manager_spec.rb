@@ -41,6 +41,13 @@ describe SQLITEClient do
             @test_client.insert_rows(['id'], [1, 2, 3])
         end
 
+        it 'should skip execution if no valid rows were received' do
+            @test_client.stubs(:_generate_row_statements).once.with([1, 2, 3]).returns('')
+            @test_client.instance_variable_get(:@db).stubs(:execute).never
+
+            @test_client.insert_rows(['id'], [1, 2, 3])
+        end
+
         it 'should raise an exception if it is unable to insert the rows' do
             @test_client.instance_variable_get(:@db).stubs(:execute).once.with(
                 "INSERT INTO boxes (id) VALUES ('1'), ('2'), ('3');"
