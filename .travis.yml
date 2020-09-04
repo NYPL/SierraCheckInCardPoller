@@ -35,7 +35,7 @@ deploy:
     variables:
       LOG_LEVEL: info
       DB_HOST: 10.146.200.10
-      DB_PORT: 1032
+      DB_PORT: '1032'
       DB_PSWD: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAGwwagYJKoZIhvcNAQcGoF0wWwIBADBWBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDDnjoRlSmwePv1QxSwIBEIAplnBJKYjr0qYPnQ3GIZ3yDzbf3i0Aa5q+dLB07MRFxbF6Rok1MKeCwZ8=
       DB_USER: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAGcwZQYJKoZIhvcNAQcGoFgwVgIBADBRBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDNapmZKmWxO59lrUhAIBEIAkPcsXj35Is8+naFzWIsWYMa9Yvt+aJZqfFZgDicQSnmEUAWBr
       DB_NAME: iii
@@ -75,9 +75,9 @@ deploy:
   environment:
     variables:
       LOG_LEVEL: info
-      DB_HOST: 10.146.200.10
-      DB_PORT: 1032
-      DB_PSWD: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAGwwagYJKoZIhvcNAQcGoF0wWwIBADBWBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDDnjoRlSmwePv1QxSwIBEIAplnBJKYjr0qYPnQ3GIZ3yDzbf3i0Aa5q+dLB07MRFxbF6Rok1MKeCwZ8=
+      DB_HOST: 10.146.200.8
+      DB_PORT: '1032'
+      DB_PSWD: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAG4wbAYJKoZIhvcNAQcGoF8wXQIBADBYBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDPIaMdJ70N4arvdlfgIBEIAr2OTX22QsmU1LpexxEDrfxjtnFqcm4pCnfDoP/z80c8iW2DEtvIOrsY7o0A==
       DB_USER: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAGcwZQYJKoZIhvcNAQcGoFgwVgIBADBRBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDNapmZKmWxO59lrUhAIBEIAkPcsXj35Is8+naFzWIsWYMa9Yvt+aJZqfFZgDicQSnmEUAWBr
       DB_NAME: iii
       DB_QUERY: 'SELECT sierra_view.holding_record_card.id, sierra_view.holding_record_card.holding_record_id,
