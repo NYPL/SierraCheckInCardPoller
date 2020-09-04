@@ -40,10 +40,9 @@ task :lint do
     sh %( rubocop )
 end
 
-
-desc "Update lambda layers, environment_variables, vpc, and events"
+desc 'Update lambda layers, environment_variables, vpc, and events'
 task :set_config do
-  rake_helper = RakeHelper.new
-  rake_helper.update_lambda_configuration
-  rake_helper.update_event
+    rake_helper = RakeHelper.new
+    rake_helper.update_lambda_configuration
+    rake_helper.update_event
 end

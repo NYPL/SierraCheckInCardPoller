@@ -15,13 +15,13 @@ Layout/ExtraSpacing:
 
 Layout/FirstHashElementIndentation:
   EnforcedStyle: consistent
-  
+
 Layout/IndentationWidth:
   Width: 4
 
 Layout/LineLength:
   Max: 120
-    
+
 Layout/MultilineMethodCallIndentation:
   EnforcedStyle: indented
 
@@ -73,6 +73,9 @@ Lint/TopLevelReturnWithArgument:
 Lint/UnreachableLoop:
   Enabled: True
 
+Metrics/AbcSize:
+  Enabled: False
+
 Metrics/BlockLength:
   Exclude:
     - 'spec/**/*'
@@ -103,6 +106,9 @@ Style/BlockDelimiters:
 Style/CaseLikeIf:
   Enabled: False
 
+Style/ClassVars:
+  Enabled: False
+
 Style/EachWithObject:
   Enabled: False
 
@@ -120,7 +126,7 @@ Style/FrozenStringLiteralComment:
 
 Style/GlobalStdStream:
   Enabled: True
- 
+
 Style/GlobalVars:
   Enabled: False
 
@@ -184,7 +190,10 @@ Style/TrailingCommaInArrayLiteral:
 Style/TrailingCommaInHashLiteral:
   Enabled: False
 
-# This one is too restrictive. E.g., 
+Style/UnlessElse:
+  Enabled: False
+
+# This one is too restrictive. E.g.,
 #     [['Mozart, Wolfgang Amadeus,', "a"], ["1756-1791", "d"]]
 #   reads better (and is easier to maintain, e.g., when making small changes) than
 #     [['Mozart, Wolfgang Amadeus,', "a"], %w[1756-1791 d]]
