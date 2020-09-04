@@ -4,6 +4,8 @@ rvm:
 before_install:
 - gem update --system
 - gem install bundler
+- gem install aws-sdk-lambda
+- gem install aws-sdk-cloudwatchevents
 - pip install awscli
 install:
 - rake run_bundler
@@ -16,7 +18,8 @@ before_deploy:
 deploy:
 - provider: lambda
   function_name: SierraCheckInCardPoller-qa
-  description: Poller service for fetching daily updates to the check-in card/box records
+  description: Poller service for fetching daily updates to the check-in card/box
+    records
   region: us-east-1
   role: arn:aws:iam::946183545209:role/lambda-full-access
   runtime: ruby2.7
@@ -27,23 +30,68 @@ deploy:
   layers:
   - arn:aws:lambda:us-east-1:946183545209:layer:ruby-pg-sqlite-lambda:2
   environment:
-  - LOG_LEVEL=info
-  - DB_HOST=10.146.200.10
-  - DB_PORT=1032
-  - DB_PSWD=AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAGwwagYJKoZIhvcNAQcGoF0wWwIBADBWBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDDnjoRlSmwePv1QxSwIBEIAplnBJKYjr0qYPnQ3GIZ3yDzbf3i0Aa5q+dLB07MRFxbF6Rok1MKeCwZ8=
-  - DB_USER=AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAGcwZQYJKoZIhvcNAQcGoFgwVgIBADBRBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDNapmZKmWxO59lrUhAIBEIAkPcsXj35Is8+naFzWIsWYMa9Yvt+aJZqfFZgDicQSnmEUAWBr
-  - DB_NAME=iii
-  - DB_QUERY='SELECT sierra_view.holding_record_card.id, sierra_view.holding_record_card.holding_record_id, sierra_view.holding_view.record_num, sierra_view.holding_record_box.* FROM sierra_view.holding_record_card LEFT OUTER JOIN sierra_view.holding_view ON sierra_view.holding_view.id=sierra_view.holding_record_card.holding_record_id LEFT OUTER JOIN sierra_view.holding_record_cardlink ON sierra_view.holding_record_card.id=sierra_view.holding_record_cardlink.holding_record_card_id LEFT OUTER JOIN sierra_view.holding_record_box ON sierra_view.holding_record_box.holding_record_cardlink_id=sierra_view.holding_record_cardlink.id'
-  - SQLITE_FILE=checkInCards.sql
-  - SQLITE_BUCKET=check-in-card-data-qa
+    variables:
+      LOG_LEVEL: info
+      DB_HOST: 10.146.200.10
+      DB_PORT: 1032
+      DB_PSWD: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAGwwagYJKoZIhvcNAQcGoF0wWwIBADBWBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDDnjoRlSmwePv1QxSwIBEIAplnBJKYjr0qYPnQ3GIZ3yDzbf3i0Aa5q+dLB07MRFxbF6Rok1MKeCwZ8=
+      DB_USER: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAGcwZQYJKoZIhvcNAQcGoFgwVgIBADBRBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDNapmZKmWxO59lrUhAIBEIAkPcsXj35Is8+naFzWIsWYMa9Yvt+aJZqfFZgDicQSnmEUAWBr
+      DB_NAME: iii
+      DB_QUERY: 'SELECT sierra_view.holding_record_card.id, sierra_view.holding_record_card.holding_record_id,
+      sierra_view.holding_view.record_num, sierra_view.holding_record_box.* FROM sierra_view.holding_record_card
+      LEFT OUTER JOIN sierra_view.holding_view ON sierra_view.holding_view.id=sierra_view.holding_record_card.holding_record_id
+      LEFT OUTER JOIN sierra_view.holding_record_cardlink ON sierra_view.holding_record_card.id=sierra_view.holding_record_cardlink.holding_record_card_id
+      LEFT OUTER JOIN sierra_view.holding_record_box ON sierra_view.holding_record_box.holding_record_cardlink_id=sierra_view.holding_record_cardlink.id'
+      SQLITE_FILE: checkInCards.sql
+      SQLITE_BUCKET: check-in-card-data-qa
   skip_cleanup: true
   access_key_id: "$AWS_ACCESS_KEY_ID_QA"
   secret_access_key: "$AWS_SECRET_ACCESS_KEY_QA"
   on:
     branch: qa
+- provider: lambda
+  function_name: SierraCheckInCardPoller-production
+  description: Poller service for fetching daily updates to the check-in card/box
+    records
+  region: us-east-1
+  role: arn:aws:iam::946183545209:role/lambda-full-access
+  runtime: ruby2.7
+  timeout: 300
+  memory_size: 256
+  module_name: app
+  handler_name: handle_event
+  layers:
+  - arn:aws:lambda:us-east-1:946183545209:layer:ruby-pg-sqlite-lambda:2
+  vpc:
+    subnet_ids:
+    - subnet-59bcdd03
+    - subnet-5deecd15
+    security_group_ids:
+    - sg-116eeb60
+  environment:
+    variables:
+      LOG_LEVEL: info
+      DB_HOST: 10.146.200.10
+      DB_PORT: 1032
+      DB_PSWD: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAGwwagYJKoZIhvcNAQcGoF0wWwIBADBWBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDDnjoRlSmwePv1QxSwIBEIAplnBJKYjr0qYPnQ3GIZ3yDzbf3i0Aa5q+dLB07MRFxbF6Rok1MKeCwZ8=
+      DB_USER: AQECAHh7ea2tyZ6phZgT4B9BDKwguhlFtRC6hgt+7HbmeFsrsgAAAGcwZQYJKoZIhvcNAQcGoFgwVgIBADBRBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDNapmZKmWxO59lrUhAIBEIAkPcsXj35Is8+naFzWIsWYMa9Yvt+aJZqfFZgDicQSnmEUAWBr
+      DB_NAME: iii
+      DB_QUERY: 'SELECT sierra_view.holding_record_card.id, sierra_view.holding_record_card.holding_record_id,
+    sierra_view.holding_view.record_num, sierra_view.holding_record_box.* FROM sierra_view.holding_record_card
+    LEFT OUTER JOIN sierra_view.holding_view ON sierra_view.holding_view.id=sierra_view.holding_record_card.holding_record_id
+    LEFT OUTER JOIN sierra_view.holding_record_cardlink ON sierra_view.holding_record_card.id=sierra_view.holding_record_cardlink.holding_record_card_id
+    LEFT OUTER JOIN sierra_view.holding_record_box ON sierra_view.holding_record_box.holding_record_cardlink_id=sierra_view.holding_record_cardlink.id'
+      SQLITE_FILE: checkInCards.sql
+      SQLITE_BUCKET: check-in-card-data-production
+  skip_cleanup: true
+  access_key_id: "$AWS_ACCESS_KEY_ID_PRODUCTION"
+  secret_access_key: "$AWS_SECRET_ACCESS_KEY_PRODUCTION"
+  on:
+    branch: production
 after_deploy:
-  - rake set_current_env_vars
+- rake set_config
 env:
   global:
-  - secure: ixD5jyowV/EkboKhBx3FCRjPKxGNLKET0iRSOSQn3UpU6GWcMSW/C4fMHLyL8DOBHuFtmXpfzjpbF6r4fNiKDx4e6iJcJxZapF5CE1Fw/x1S237fniMquNRrJfE2R6Z7wrudwWV9pNzAUuVuLL4DCk2TJ8lemJEuH7d6ZhPU72t5+NkfRLNhKbPpEm7VM7awNg+WxP4J/ZvKemkhjJ2v2rgCR0+zvgCePGskzWpKLloGOtDyPCmlv+2PhQziJLCV+HrwlPFqj2Iz8IAmrieCZc2pSiTU/XQ7gfbOiYlUpjpXQanrBH9UEcVMf1SHWlQynfsj+XJnmBjOjoG9LE3k2t51mTJj/GhJdei5UJvmy3f+dmAkeUZFRbRkIT0Dq8NVYZvIRMN1BGHILii0gPrebL3ODsDfAjhABU/r/8CWgfWiRiONDKEjRABlANPzVx4eid2KUnR308LHBJoF4uUyUyR2whoSDIgzXBzH5CT1bLTeA2cvFSr4g2de/Q0LI6MWJ0lsFN9noGOSxnthMM5zu4t1lVnAGMLfHrCAs+ESxKNDJyrl2/B+dY5umTeU5PaAXO9lrUdhm5e9qlEmP3gaIDtcwoCyGdvg+ZvcW/duw5hxjGG/9yNs3PY0eTwsdDmGemecdRQ/2MjTjhOCiDiLrDV63NUucHC6h8ZyZYMlieU=
-  - secure: RpPycTqtBNcxT29j65CBBCZtR2uvI4zK2S92NJDca8ggtnJ+taA56VLMRPUQGWwUAUMgIF3qVR0rGwCCbf6HBML5fPhB+rG7jpDZwUm0kIoby9Vxqzqsj7OPAP9N8WBMaLTAk7zVcq85Fee5N/rAlytnR/UIK43i0YJ0Gnx2HT7s377+Zbe+fKkJTY2E631Iz6U777+ze6OgnaxhDXUG4I+I9Kl1+a8qunHrZp0hIwKwYCVxCKUCM46PlgB+jCcyFwWgUeGoHtxaZ4f7YUFLYGSWSnARCJN+pDX2tmEmNwcDmGqGDptCq3R00H68UZFPeRZl9OPRn2BU6FJ+NlkKirj0WfnG7Wlp9E9+tXjOQ9eqBwpOF0xppUBRpPk/AAh/onl8WaBHJyOFzP8VUiVcQmhFRkqTiwC1DsFVOMRjZSPeKZgBbiZu0HgZsedxYhhLX/t8vI7cqLzWHDojtfbjZ1XPgMGsBkIc/K43uMxSXfeCQVkbnEG4JMpW72tPzt1GsIZ5fXAJsnoJ4EmbEqYJeAJVskPcB5EHarl7CJMMxU+4mwkTtR/g1mzJH8QN0vuNSgYuy3+YKtvg7Ckq3KDs0lNNtVadY/G+25w96FBA6GHLvpXTE+x8/FvdWHVqDhxPEy6eVWa5XRA/DqtWk473X9Q8Zc9MxLBfENkwANTrnms=
+  - secure: P66YkrTilBUPwAlShOQPvkEFaOs8NOpjylNACJSrfw7Dr5t/RQsnUOCburoDzN+MmZDp7lVdAaVyH5Y5rcVcq74x3QwaMKLnhZr8q15zVYjG3fS+q1VOmfXagF3GbmFWKWGLsDQi1Cz1XwjD+zwyJuCIavGErLv4JRd6r6hzj9Z3QgplF8iS+3+3CjDnvL/BWNtG1wEH4vtrsphuHcTyIA7tTqduXHGzVFdxTx3dYiazNpDKJuSKGR/TewrWZU+ZwY1uK+2vRAna0rDqjxNfNzcIEUv80JtUJJqLdtqDlH/A2nR2IZSXGHmFN5MJByO7z/XCZgg9l4aq7S6SqlVH5vQzMUDTgTMVO4CSKupwkwyAdjKnPNT+KyeLZtT6JVpFHH8wDokUcp/UbZzVKLIfiUrv1aF25ilXWjlkzGe8RulApEUgtXM8ck2o2yDu9I5x1uECop21dLXL4TPOF3N35bRtRgq8qTYmrOrex/iznCFwLSbNP8e8UvrBHG30QkF2ebXc9rQHm9znhUH2w3z+lU95kIMYGLwklDLL+mfcQqrnRQJEvkzFuXG2UQOB7Kg56TFF5bICPtpodUvS2+PetXEdsXUY3f49ENnvUojPmDFCSg7d6dfKb7KUT85t+isLTbTkdhWqxjBpfD8cT067VKSlqsOi3LfVq649zM5yLGg=
+  - secure: VI9ivKt/mVEcY7FEaGPRTvnoVvZ34748DIcukLJa0oLlu9VHUsZxu4pa3ztWtWEr+n7EAoMPjbzhHwfrDuDL5bzUVojn13b+Wi463+2ZhmoFxo++aqDSWJnbCA/mr40r9jPG57m/rzO2y0e6L403DMJspsey7yPUwRybUSPnf+lXqbEnSbzo+uUXCsMAWAXYMeRTgV6WUCpTCVF6vgp1Alo0C9/qSRfmUmihNMZiS80wcw7/xcQ5iEfyCqwZFMCX1gm9AAWZdk4aIXXBDrlvIhIN19gBM2kvvfgzhHRDLAS7ZMJqNBQniJKHTeT1QVN2uQjyaSTZFGJ1WnnmSdaqocPIuB97+djMEfWXN3UyXMmR1MPcUR+t7dyEOJ9KOUSeZKCZ5JQWYPdUcTFJEQOMm2wSZpw8Pglc6LWurucBi8AygVggdEOQk19lexzIYN77rzi7Guc2PlhQ1otDAGUHMYcPggo6GhKuKFGIFlaCKjlk99a4AJPFU1i7kW9E+K1ITF/dd/qSfgP7iiLMuUim2z2aupaNCv5ovDOLdApSEY/cmWmb8/AGQ/ltT1LUw2Ws4UQtcxU+25sKZi/0Kfqg8qcW3VlWGXiMqXVbQs+m4/dZLwpAwNJ58PnUmGAykMzz8j1JSVlL76Fjm26Iudaww5aqQQ+kIPCFPqgm7anFPgY=
+  - secure: SFCAmF6q4obriayT0hvZ1knQLDpxP+b1skxZG6uuQ5rktVNjOgrh7gXAStgUpXJIVg8S1VxOMsxN+9jkI8u923VLRo6umm7faOTjja1GzbDeZ9tcFYQkRyoIz5eaofg7SYvb6zOB5cED8DIEc6AC8h0iIpt+oJbkouWvichiP6wlUHUls6hGalwX3vyq4jmozTXPHR2BVva3nMuFj/KEs14FdSRiUQwOeKh1czfRzTAo6yRlu1XlhfNczgezdTaYdblplLZw+38Wq/QR/M/mfVKA/XTpyGz1txYERt4XJq4FHqxsMaROp2sY8Md2s5sRrzLB9wWSN4meLYMHX24Fx5yBUxMEbefB8m+j8CqHLJ66JYT2OEF/LjZGVcu+Etp9x/Dz+6RxfAD+yro3MhVsuzyZG/mJ9zpsyBYr/PLk289ZmyQqZM6YdyxvUu/Urwt1++R23D8cE4h+sga5D5ZzKp3Ng85VhIIVIwoXtg6TCkhTDf0fLk2ryeo23LKACJP8B3LNFSwXRSijkqC39NLpawRHAbx28hEHOUFplQNNIOEEUdvgS+34f3HXD6ON3LkUza+FbP/JCjQiVt0aA+5ji152BpbjJRs2A1cSz56UTcV50fAUOycIzwAdJWN3kYLUB/X+LRvIMwcr7TI1stdNoLnUatv7hdaINpzw/zHfY08=
