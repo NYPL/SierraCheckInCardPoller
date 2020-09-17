@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## [Unreleased]
+## 0.0.1 - 2020-09-17
 ### Added
 - Initial commit containing Sierra database poller and sqlite database writer
 - Added supporting documentation
