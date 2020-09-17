@@ -1,5 +1,7 @@
 # SierraCheckInCardPoller
 
+[![Build Status](https://travis-ci.com/NYPL/SierraCheckInCardPoller.svg?branch=main)](https://travis-ci.com/NYPL/SierraCheckInCardPoller) [![GitHub version](https://badge.fury.io/gh/nypl%2FsierraCheckInCardPoller.svg)](https://badge.fury.io/gh/nypl%2FsierraCheckInCardPoller)
+
 This function fetches updates to the check-in cards & boxes from the Sierra PostgreSQL database, which is used to add these records to serials in Shared Collection Catalog. This data is not exposed through the Sierra API, and to avoid taxing the database this fetches updates periodically and stores them in a SQLite database, which in turn is stored in a s3 bucket. This makes it available to other functions or apps on an as-needed basis, without having to run a full RDS database instance.
 
 ## Data Structure
