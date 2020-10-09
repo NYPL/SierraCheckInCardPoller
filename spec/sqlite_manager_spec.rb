@@ -32,7 +32,7 @@ describe SQLITEClient do
 
         it 'should execute insert statement for all rows' do
             @test_client.instance_variable_get(:@db).stubs(:execute).once.with(
-                "INSERT INTO boxes (id) VALUES ('1'), ('2'), ('3');"
+                "INSERT OR IGNORE INTO boxes (id) VALUES ('1'), ('2'), ('3');"
             )
             @test_client.stubs(:_generate_row_statements).once.with([1, 2, 3]).returns(
                 "('1'), ('2'), ('3')"
@@ -50,7 +50,7 @@ describe SQLITEClient do
 
         it 'should raise an exception if it is unable to insert the rows' do
             @test_client.instance_variable_get(:@db).stubs(:execute).once.with(
-                "INSERT INTO boxes (id) VALUES ('1'), ('2'), ('3');"
+                "INSERT OR IGNORE INTO boxes (id) VALUES ('1'), ('2'), ('3');"
             ).raises(SQLite3::Exception.new('test error'))
             @test_client.stubs(:_generate_row_statements).once.with([1, 2, 3]).returns(
                 "('1'), ('2'), ('3')"
