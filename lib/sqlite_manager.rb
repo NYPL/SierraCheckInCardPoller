@@ -11,7 +11,7 @@ class SQLITEClient
 
         @db.execute <<-BOXES
             create table boxes (
-                id int,
+                id int UNIQUE,
                 holding_record_id int,
                 record_num int,
                 holding_record_cardlink_id int,
@@ -53,7 +53,7 @@ class SQLITEClient
         return if insert_stmt.length == 0
 
         begin
-            @db.execute("INSERT INTO boxes (#{fields.join(', ')}) VALUES #{insert_stmt};")
+            @db.execute("INSERT OR IGNORE INTO boxes (#{fields.join(', ')}) VALUES #{insert_stmt};")
         rescue StandardError => e
             $logger.debug insert_stmt
             $logger.error 'Unable to insert rows into boxes table', { code: e.code }
